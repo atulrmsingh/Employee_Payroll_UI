@@ -7,15 +7,17 @@ import { pink } from "@mui/material/colors";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
+import addEmployee from "../../UserService/AddEmployee";
 
 function Add({ employees, setEmployees, setIsAdding }) {
-  const [Name, setName] = useState("");
-  const [Gender, setGender] = useState("");
-  const [Department, setDepartment] = useState("");
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
+  const [departmentName, setDepartmentName] = useState("");
   const [salary, setSalary] = useState("");
-  const [StartDate, setStartDate] = useState("");
+  const [startDate, setStartDate] = useState("");
   const [ProfilePhoto, setProfilePhoto] = useState("");
   const textInput = useRef(null);
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     textInput.current.focus();
@@ -24,12 +26,12 @@ function Add({ employees, setEmployees, setIsAdding }) {
   const handleAdd = (e) => {
     e.preventDefault();
     if (
-      !Name ||
-      !Gender ||
-      !Department ||
+      !name ||
+      !gender ||
+      !departmentName ||
       !salary ||
-      !StartDate ||
-      !ProfilePhoto
+      !startDate ||
+      !notes
     ) {
       return Swal.fire({
         icon: "error",
@@ -39,24 +41,31 @@ function Add({ employees, setEmployees, setIsAdding }) {
       });
     }
 
-    const id = employees.length + 1;
+   // const id = employees.length + 1;
+    const department =[{
+      departmentName,
+    }]
     const newEmployee = {
-      id,
-      Name,
-      Gender,
-      Department,
+      //id,
+      name,
+      gender,
+      department,
       salary,
-      StartDate,
-      ProfilePhoto,
+      startDate,
+      notes,
     };
+    
     employees.push(newEmployee);
     setEmployees(employees);
     setIsAdding(false);
+    addEmployee(newEmployee).then((response) => {
+      console.log(response.data);
+    })
 
     Swal.fire({
       icon: "success",
       title: "Added!",
-      text: `${Name} 's data has been Added.`,
+      text: `${name} 's data has been Added.`,
       showConfirmButton: false,
       timer: 1500,
     });
@@ -69,15 +78,16 @@ function Add({ employees, setEmployees, setIsAdding }) {
         <h5>Employee Payroll Form</h5>
         <div className="contain-table">
           <table>
+          <tbody>
             <tr>
               <td>Name</td>
               <td>
                 <input
-                  id="Name"
+                  id="name"
                   type="text"
                   ref={textInput}
                   name="name"
-                  value={Name}
+                  value={name}
                   size="small"
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -91,7 +101,7 @@ function Add({ employees, setEmployees, setIsAdding }) {
                     type="radio"
                     id="profileImage"
                     name="profileImage"
-                    value="profileImageFemale"
+                    value={ProfilePhoto}
                     onChange={(e) => setProfilePhoto(e.target.value)}
                   />
                   <Avatar
@@ -102,7 +112,7 @@ function Add({ employees, setEmployees, setIsAdding }) {
                     type="radio"
                     id="profileImage"
                     name="profileImage"
-                    value="profileImageFemale"
+                    value={ProfilePhoto}
                     onChange={(e) => setProfilePhoto(e.target.value)}
                   />
                   <Avatar
@@ -113,7 +123,7 @@ function Add({ employees, setEmployees, setIsAdding }) {
                     type="radio"
                     id="profileImage"
                     name="profileImage"
-                    value="profileImageFemale"
+                    value={ProfilePhoto}
                     onChange={(e) => setProfilePhoto(e.target.value)}
                   />
                   <Avatar
@@ -124,7 +134,7 @@ function Add({ employees, setEmployees, setIsAdding }) {
                     type="radio"
                     id="profileImage"
                     name="profileImage"
-                    value="profileImageFemale"
+                    value={ProfilePhoto}
                     onChange={(e) => setProfilePhoto(e.target.value)}
                   />
                   <Avatar
@@ -159,39 +169,46 @@ function Add({ employees, setEmployees, setIsAdding }) {
               <td>Department</td>
               <td>
                 <div>
-                  <Checkbox {...label} size="small" />
+                  <Checkbox {...label} size="small" 
+                     value="HR"
+                    onChange={(e) => setDepartmentName(e.target.value)}
+                  />
                   HR
                   <Checkbox
                     {...label}
                     size="small"
                     color="secondary"
-                    onChange={(e) => setDepartment(e.target.value)}
+                    value="SALES"
+                    onChange={(e) => setDepartmentName(e.target.value)}
                   />
                   SALES
                   <Checkbox
                     {...label}
                     size="small"
                     color="success"
-                    onChange={(e) => setDepartment(e.target.value)}
+                    value="FINANCE"
+                    onChange={(e) => setDepartmentName(e.target.value)}
                   />
                   FINANCE
                   <Checkbox
                     {...label}
                     size="small"
                     color="default"
-                    onChange={(e) => setDepartment(e.target.value)}
+                    value="ENGINEER"
+                    onChange={(e) => setDepartmentName(e.target.value)}
                   />
                   ENGINEER
                   <Checkbox
                     {...label}
                     size="small"
+                    value="OTHERS"
                     sx={{
                       color: pink[800],
                       "&.Mui-checked": {
                         color: pink[600],
                       },
                     }}
-                    onChange={(e) => setDepartment(e.target.value)}
+                    onChange={(e) => setDepartmentName(e.target.value)}
                   />
                   OTHERS
                 </div>
@@ -217,7 +234,7 @@ function Add({ employees, setEmployees, setIsAdding }) {
                   id="StartDate"
                   type="date"
                   name="StartDate"
-                  value={StartDate}
+                  value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
               </td>
@@ -227,12 +244,15 @@ function Add({ employees, setEmployees, setIsAdding }) {
               <td>Notes</td>
               <td>
                 <Box
+                
                   sx={{
                     width: "100%",
                     maxWidth: "100%",
                   }}
                 >
-                  <TextField fullWidth id="fullWidth" />
+                  <TextField fullWidth id="fullWidth" 
+                  value={notes}
+                    onChange={e => setNotes(e.target.value)} />
                 </Box>
               </td>
             </tr>
@@ -252,7 +272,7 @@ function Add({ employees, setEmployees, setIsAdding }) {
                     variant="contained"
                     type="submit"
                     color="success"
-                    onClick={() => setIsAdding(true)}
+                    
                   >
                     Submit
                   </Button>
@@ -262,6 +282,7 @@ function Add({ employees, setEmployees, setIsAdding }) {
                 </Stack>
               </td>
             </tr>
+            </tbody>
           </table>
         </div>
       </div>

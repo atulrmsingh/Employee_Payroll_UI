@@ -1,27 +1,27 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { styled } from "@mui/material/styles";
 import { pink } from "@mui/material/colors";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-
+import updateEmployee from "../../UserService/UpdateEmployee";
 function Edit({ employees, selectedEmployee, setEmployees, setIsEditing }) {
   const id = selectedEmployee.employeeId;
 
-  const [Name, setName] = useState(selectedEmployee.name);
-  const [Gender, setGender] = useState(selectedEmployee.gender);
-  const [Department, setDepartment] = useState(
+  const [name, setName] = useState(selectedEmployee.name);
+  const [gender, setGender] = useState(selectedEmployee.gender);
+  const [departmentName, setDepartmentName] = useState(
     selectedEmployee.department[0].departmentName
+    
   );
   const [salary, setSalary] = useState(selectedEmployee.salary);
-  const [StartDate, setStartDate] = useState(selectedEmployee.startDate);
+  const [startDate, setStartDate] = useState(selectedEmployee.startDate);
 console.log('Employee Edit data : :',employees);
 console.log('Single Employee Edit data : :',selectedEmployee);
   const handleUpdate = (e) => {
     e.preventDefault();
 
-    if (!Name || !Gender || !Department || !salary || !StartDate) {
+    if (!name || !gender || !departmentName || !salary || !startDate) {
       return Swal.fire({
         icon: "error",
         title: "Error!",
@@ -29,14 +29,18 @@ console.log('Single Employee Edit data : :',selectedEmployee);
         showConfirmButton: true,
       });
     }
+    const department =[{
+      departmentName,
+    }]
+
 
     const employee = {
       id,
-      Name,
-      Gender,
-      Department,
+      name,
+      gender,
+      department,
       salary,
-      StartDate,
+      startDate,
     };
 
     for (let i = 0; i < employees.length; i++) {
@@ -45,10 +49,12 @@ console.log('Single Employee Edit data : :',selectedEmployee);
         break;
       }
     }
-
+    
     setEmployees(employees);
     setIsEditing(false);
-
+    updateEmployee(id,employee).then((response) =>{
+      console.log(response.data);
+    })
     Swal.fire({
       icon: "success",
       title: "Updated!",
@@ -58,9 +64,9 @@ console.log('Single Employee Edit data : :',selectedEmployee);
     });
   };
 
-  const Input = styled("input")({
+ /* const Input = styled("input")({
     display: "none",
-  });
+  });*/
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   return (
     <form onSubmit={handleUpdate}>
@@ -68,15 +74,15 @@ console.log('Single Employee Edit data : :',selectedEmployee);
         <h5>Update Employee Details</h5>
         <div className="contain-table">
           <table>
+          <tbody>
             <tr>
               <td>Name</td>
               <td>
                 <input
-                  id="Name"
+                  id="name"
                   type="text"
-                  ref={Input}
-                  Name="Name"
-                  value={Name}
+                  name="name"
+                  value={name}
                   size="small"
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -89,7 +95,7 @@ console.log('Single Employee Edit data : :',selectedEmployee);
                   type="radio"
                   id="gender"
                   name="gender"
-                  value="Female"
+                  value={gender}
                   onChange={(e) => setGender(e.target.value)}
                 />
                 Female &nbsp;&nbsp;&nbsp;&nbsp;
@@ -97,7 +103,7 @@ console.log('Single Employee Edit data : :',selectedEmployee);
                   type="radio"
                   id="gender"
                   name="gender"
-                  value="Male"
+                  value={gender}
                   onChange={(e) => setGender(e.target.value)}
                 />
                 Male
@@ -106,7 +112,7 @@ console.log('Single Employee Edit data : :',selectedEmployee);
             <tr>
               <td>Department</td>
               <td>
-                <div>
+               
                   <Checkbox {...label} size="small" />
                   HR
                   <Checkbox
@@ -114,7 +120,8 @@ console.log('Single Employee Edit data : :',selectedEmployee);
                     id="HR"
                     size="small"
                     color="secondary"
-                    onChange={(e) => setDepartment((e.target.value = "HR"))}
+                    value={departmentName}
+                    onChange={(e) => setDepartmentName((e.target.value = "HR"))}
                   />
                   SALES
                   <Checkbox
@@ -122,7 +129,8 @@ console.log('Single Employee Edit data : :',selectedEmployee);
                     id="SALES"
                     size="small"
                     color="success"
-                    onChange={(e) => setDepartment(e.target.value)}
+                    value={departmentName}
+                    onChange={(e) => setDepartmentName(e.target.value)}
                   />
                   FINANCE
                   <Checkbox
@@ -130,23 +138,25 @@ console.log('Single Employee Edit data : :',selectedEmployee);
                     id="FINANCE"
                     size="small"
                     color="default"
-                    onChange={(e) => setDepartment(e.target.value)}
+                    value={departmentName}
+                    onChange={(e) => setDepartmentName(e.target.value)}
                   />
                   ENGINEER
                   <Checkbox
                     {...label}
                     id="ENGINEER"
                     size="small"
+                    value={departmentName}
                     sx={{
                       color: pink[800],
                       "&.Mui-checked": {
                         color: pink[600],
                       },
                     }}
-                    onChange={(e) => setDepartment(e.target.value)}
+                    onChange={(e) => setDepartmentName(e.target.value)}
                   />
                   OTHERS
-                </div>
+               
               </td>
             </tr>
 
@@ -169,7 +179,7 @@ console.log('Single Employee Edit data : :',selectedEmployee);
                   id="StartDate"
                   type="date"
                   name="StartDate"
-                  value={StartDate}
+                  value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
               </td>
@@ -187,16 +197,20 @@ console.log('Single Employee Edit data : :',selectedEmployee);
                 </Box>
               </td>
             </tr>
-            <div style={{ marginTop: "30px" }}>
-              <input type="submit" value="Update" />
-              <input
+        
+              <tr>
+              <td><input type="submit" value="Update" /></td>
+              <td><input
                 style={{ marginLeft: "12px" }}
                 className="muted-button"
                 type="button"
                 value="Cancel"
                 onClick={() => setIsEditing(false)}
-              />
-            </div>
+              /></td>
+              </tr>
+              
+
+            </tbody>
           </table>
         </div>
       </div>

@@ -36,10 +36,10 @@ function List({ employees, handleEdit, handleDelete }) {
                 <td>₹ {employee?.salary} </td>
                 <td> {employee?.startDate}</td> 
                 <td>
-                  <EditIcon onClick={() => handleEdit(employee.id)} />
+                  <EditIcon onClick={() => handleEdit(employee.employeeId)} />
                 </td>
                 <td>
-                  <DeleteIcon onClick={() => handleDelete(employee.id)} />
+                  <DeleteIcon onClick={() => handleDelete(employee.employeeId)} />
                 </td>
               </tr>
             ))}

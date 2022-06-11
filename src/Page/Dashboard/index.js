@@ -4,8 +4,9 @@ import Header from "./Header";
 import List from "./List";
 import Add from "./Add";
 import Edit from "./Edit";
-import getEmployees from "../../UserService/UserService";
+import getEmployees from "../../UserService/GetAllEmployees";
 import SearchBar from './SearchBar';
+import deleteEmployee from "../../UserService/DeleteEmployee";
 
 function Dashboard() {
   const [employees, setEmployees] = useState([]);
@@ -15,6 +16,7 @@ function Dashboard() {
 
   useEffect(() => {
     getEmployeeDetails();
+
   }, []);
 
   const getEmployeeDetails = async() => {
@@ -28,9 +30,9 @@ function Dashboard() {
    });
 
   };
-
+ 
   const handleEdit = (id) => {
-    const [employee] = employees.filter((employee) => employee.id === id);
+    const [employee] = employees.filter((employee) => employee.employeeId === id);
 
     setSelectedEmployee(employee);
     setIsEditing(true);
@@ -49,17 +51,19 @@ function Dashboard() {
       cancelButtonText: "No, cancel!",
     }).then((result) => {
       if (result.value) {
-        const [employee] = employees.filter((employee) => employee.id === id);
-
+        const [employee] = employees.filter((employee) => employee.employeeId === id);
+        deleteEmployee(id).then((response) =>{
+          console.log(response.data);
+        })
         Swal.fire({
           icon: "success",
           title: "Deleted!",
-          text: `${employee.firstName}'s data has been deleted.`,
+          text: `${employee.name}'s data has been deleted.`,
           showConfirmButton: false,
           timer: 1500,
         });
 
-        setEmployees(employees.filter((employee) => employee.id !== id));
+        //setEmployees(employees.filter((employee) => employee.id !== id));
       }
     });
   };
